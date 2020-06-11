@@ -9,19 +9,21 @@
 """
 
 
+import re
 import csv
 import pandas as pd
 
-from api import edit
+from api import edit, getPageContent
 
 
 def normalize_template(header, row):
   title = row[0]
-  template = "{{" + row[1] + "\n"
+  template = row[1]
+  text = "{{" + template + "\n"
   for i in range(2, len(row)):
-    template += "|" + header[i] + "=" + row[i] + "\n"
-  template += "}}"
-  return title, template
+    text += "|" + header[i] + "=" + row[i] + "\n"
+  text += "}}\n"
+  return title, template, text
 
 
 def handle_file(filename):
@@ -46,17 +48,37 @@ def handle_file(filename):
   return header, content
 
 
-def update_with_csv(filename):
+def replace_template(wikitext, template, text):
+  if wikitext:
+    if "{{" + template in wikitext:
+      return re.sub("{{" + template + "\n((.|\n)*?)\n}}\n", text, wikitext, 1)
+    return text + wikitext
+  return text
+
+
+def update_with_file(filename, template_only=True):
   header, content = handle_file(filename)
   for row in content:
-    title, template = normalize_template(header, row)
-    # TODO: 后续会加上更复杂的功能，比如仅更新模板部分等
-    print(edit(title, template))
+    title, template, text = normalize_template(header, row)
+    if template_only:
+      page_content = getPageContent(title)
+      new_text = replace_template(page_content, template, text)
+      print(edit(title, new_text))
+    else:
+      print(edit(title, text))
 
 
 # test part
 if __name__ == "__main__":
   # print(handle_file("unpush/test.csv"))
   # print(handle_file("unpush/英雄UP表.xlsx"))
-  update_with_csv("unpush/test.csv")
-  
+  # update_with_file("unpush/test.csv")
+  update_with_file("unpush/test道具.xlsx", template_only=True)
+
+  # print([getPageContent("盖亚的钥匙")])
+  # print('1234{{1}}'[0:2])
+  # _wikiext = "123{{muban\n|12={{ganrao|1}}\n|23={{{canshu|}}}\n}}\n==exp==1243{{show}}"
+  # _template = '{{muban\n((.|\n)*?)\n}}\n'
+  # _span = re.search(_template, _wikiext).span()
+  # print([_wikiext[_span[0]:_span[1]]])
+  # print(re.sub(_template, "{{tihuan}}", _wikiext, 1))

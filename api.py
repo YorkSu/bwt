@@ -64,7 +64,7 @@ def getPageContent(title):
   response = getPage(title)
   # print(response)
   if "error" in response:
-    return None
+    return ""
   return response["parse"]["wikitext"]["*"]
 
 

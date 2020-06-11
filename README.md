@@ -10,6 +10,12 @@ BWIKI 小工具，基于MediaWiki API
 
 * Python 3
 
+### 包
+
+* request
+* pandas
+* xlrd
+
 ## 准备
 
 请先在根目录创建一个`config.json`文件，填写以下内容
