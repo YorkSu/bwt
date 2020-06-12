@@ -15,6 +15,8 @@ BWIKI 小工具，基于MediaWiki API
 * request
 * pandas
 * xlrd
+* pywin32
+* cryptography
 
 ## 准备
 
@@ -22,13 +24,13 @@ BWIKI 小工具，基于MediaWiki API
 
 ```json
 {
-	"url": "https://wiki.biligame.com/xxxx/api.php", // xxxx改为你的BWIKI链接
-	"cookie":"xxxx"                                  // 改为当前登录用户的cookie
+  "host":"wiki.biligame.com", // BWIKI站点，不用改动
+  "path":"/xxxx", // xxxx改为你的BWIKI链接
+  "browser":"Edge", // 填写你的浏览器名字，目前支持新版Edge、Chrome
+  "SESSDATA":"xxxxxx;" // 改为对应浏览器登录用户的SESSDATA
 }
 ```
 
-> 如何获取 cookie ？
+> 如何获取 SESSDATA ？
 >
-> 登录BWIKI后，打开浏览器开发者工具（F12）的网络（network）标签页，再刷新当前页面（F5），点击列表中的第一个请求，在右侧弹出的信息窗口中找到cookie一项，全部复制并粘入对应位置。
-> 如果登录状态为`valid`，即cookie正常
-> 如果登陆状态为`invalid`，需要重新获取cookie
+> 登录BWIKI后，打开浏览器开发者工具（F12）的网络（network）标签页，再刷新当前页面（F5），点击列表中的第一个请求，在右侧弹出的信息窗口中找到cookie一项，找到`SESSDATA`，将值复制出来即可。

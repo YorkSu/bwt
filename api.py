@@ -11,7 +11,7 @@
 import json
 import requests
 
-from bwt.user import url, headers, query
+from bwt.user import url, cookies, query
 
 
 def edit(title, text, minor=False, bot=False, createonly=False, prependtext="", appendtext=""):
@@ -20,7 +20,7 @@ def edit(title, text, minor=False, bot=False, createonly=False, prependtext="", 
   data["action"] = "edit"
   data["title"] = title
   data["text"] = text
-  response = json.loads(requests.post(url=url, headers=headers, data=data).text)
+  response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
   return response
 
 
@@ -31,7 +31,7 @@ def move(fr, to, reason=""):
   data["from"] = fr
   data["to"] = to
   data["reason"] = reason
-  response = json.loads(requests.post(url=url, headers=headers, data=data).text)
+  response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
   return response
 
 
@@ -46,7 +46,7 @@ def purge(titles):
   else:
     data["titles"] = titles
   data["action"] = "purge"
-  response = json.loads(requests.post(url=url, headers=headers, data=data).text)
+  response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
   return response
 
 
@@ -56,7 +56,7 @@ def getPage(title):
   data["action"] = "parse"
   data["page"] = title
   data["prop"] = "wikitext"
-  response = json.loads(requests.post(url=url, headers=headers, data=data).text)
+  response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
   return response
 
 
@@ -81,7 +81,7 @@ def getAllPage():
     if apcontinue:
       data["continue"] = "-||"
       data["apcontinue"] = apcontinue
-    response = json.loads(requests.post(url=url, headers=headers, data=data).text)
+    response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
     titles.extend(response['query']['allpages'])
     if "continue" in response:
       apcontinue = response["continue"]["apcontinue"]
