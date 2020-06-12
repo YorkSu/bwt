@@ -17,6 +17,12 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 import json
 import requests
 
+_LOCALAPPDATA = os.environ['LOCALAPPDATA']
+EDGE_LOCAL_STATE = _LOCALAPPDATA + r'\Microsoft\Edge\User Data\Local State'
+EDGE_COOKIE_PATH = _LOCALAPPDATA + r'\Microsoft\Edge\User Data\Default\Cookies'
+CHROME_LOCAL_STATE = _LOCALAPPDATA + r'\Google\Chrome\User Data\Local State'
+CHROME_COOKIE_PATH = _LOCALAPPDATA + r'\Google\Chrome\User Data\Default\Cookies'
+
 
 def get_string(local_state):
     with open(local_state, 'r', encoding='utf-8') as f:
@@ -40,14 +46,15 @@ def decrypt_string(key, data):
 
 
 def get_cookie(host, path, browser):
-  # r"C:\Users\York\AppData\Local\Microsoft\Edge\User Data\Default\Cookies"
   if browser.lower() == 'edge':
-    browser_dir = r"Microsoft\Edge"
+    local_state = EDGE_LOCAL_STATE
+    cookie_path = EDGE_COOKIE_PATH
   elif browser.lower() == 'chrome':
-    browser_dir = r"Google\Chrome"
-  local_state = os.environ['LOCALAPPDATA'] + '\\' + browser_dir + r'\User Data\Local State'
-  cookie_path = os.environ['LOCALAPPDATA'] + '\\' + browser_dir + r"\User Data\Default\Cookies"
-  sql = f"select host_key,name,encrypted_value from cookies where host_key='{host}' and path='{path}'"
+    local_state = CHROME_LOCAL_STATE
+    cookie_path = CHROME_COOKIE_PATH
+  sql = f"select host_key,name,encrypted_value from cookies where host_key='{host}'"
+  if path:
+    sql += f" and path='{path}'"
   with sqlite3.connect(cookie_path) as conn:
     cu = conn.cursor()
     res = cu.execute(sql).fetchall()
@@ -86,11 +93,13 @@ def check_token(cookies, query):
 with open("config.json", 'r') as f:
   config = json.loads(f.read())
   host = config["host"]
+  host2 = config["host2"]
   path = config["path"]
   browser = config["browser"]
   url = f"https://{host}{path}/api.php"
   cookies = get_cookie(host, path, browser)
-  cookies["SESSDATA"] = config["SESSDATA"]
+  cookies2 = get_cookie(host2, "/", browser)
+  cookies["SESSDATA"] = cookies2["SESSDATA"]
   query = {
       "format": "json",
       "token": get_token(cookies)}

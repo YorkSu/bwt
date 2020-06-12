@@ -9,28 +9,17 @@ BWIKI 小工具，基于MediaWiki API
 ## 环境
 
 * Python 3
-
-### 包
-
-* request
-* pandas
-* xlrd
-* pywin32
-* cryptography
+* 依赖包请参考requirements.txt, 执行`pip install -r requirements.txt`即可
 
 ## 准备
 
-请先在根目录创建一个`config.json`文件，填写以下内容
+请修改根目录的`config.json`文件
 
 ```json
 {
-  "host":"wiki.biligame.com", // BWIKI站点，不用改动
+  "host":"wiki.biligame.com", // 不用改动
+  "host2":".biligame.com",// 不用改动
   "path":"/xxxx", // xxxx改为你的BWIKI链接
-  "browser":"Edge", // 填写你的浏览器名字，目前支持新版Edge、Chrome
-  "SESSDATA":"xxxxxx;" // 改为对应浏览器登录用户的SESSDATA
+  "browser":"Edge" // 填写你的浏览器名字，目前支持新版Edge、Chrome
 }
 ```
-
-> 如何获取 SESSDATA ？
->
-> 登录BWIKI后，打开浏览器开发者工具（F12）的网络（network）标签页，再刷新当前页面（F5），点击列表中的第一个请求，在右侧弹出的信息窗口中找到cookie一项，找到`SESSDATA`，将值复制出来即可。
