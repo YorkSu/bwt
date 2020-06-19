@@ -13,7 +13,7 @@ import re
 import csv
 import pandas as pd
 
-from api import edit, getPageContent
+from bwt.api import edit, getPageContent
 
 
 def normalize_template(header, row):
@@ -42,6 +42,7 @@ def handle_file(filename):
   # == Excel ==
   elif ext in ['xlsx', 'xls']:
     data = pd.read_excel(filename, header=0)
+    data = data.where(data.notnull(), None)
     header = data.columns.tolist()
     for i in range(data.shape[0]):
       content.append(data.loc[i].tolist())
