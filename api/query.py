@@ -59,46 +59,6 @@ def _abstract_ns_allpages(ns):
   return _get_all(data, "allpages", "apcontinue")
 
 
-def to_titles(responses, value='title'):
-  assert isinstance(responses, (list, tuple))
-  titles = []
-  for item in responses:
-    titles.append(item[value])
-  return titles
-
-
-def from_category(category):
-  """api.query.from_category
-  
-    获取给定分类中的所有页面
-
-    Args:
-      category: 分类名
-        如果没有'分类:'会自动填充
-
-    Returns:
-      List Of Response(py.Dict)
-    
-    Response:
-      {
-        'pageid': 页面id,
-        'ns': 0,
-        'title': 标题,
-      }
-  """
-  # 保证标题名带有命名空间 分类
-  if len(category) <= 3 and category[:3] not in ['分类:']:
-    category = '分类:' + category
-  data = {}
-  data.update(query)
-  data.pop('token')
-  data["action"] = "query"
-  data["list"] = "categorymembers"
-  data["cmtitle"] = category
-  data["cmlimit"] = "max"
-  return _get_all(data, "categorymembers", "cmcontinue")
-
-
 def ns_main():
   """api.query.ns_main
   
@@ -171,11 +131,110 @@ def ns_categories():
   return _abstract_ns_allpages(14)
 
 
+def referenced_category(category):
+  """api.query.referenced_category
+  
+    获取给定分类中的所有页面
+
+    Args:
+      category: 分类名
+        如果没有'分类:'会自动填充
+
+    Returns:
+      List Of Response(py.Dict)
+    
+    Response:
+      {
+        'pageid': 页面id,
+        'ns': 0,
+        'title': 标题,
+      }
+  """
+  # 保证标题名带有命名空间 分类
+  if len(category) <= 3 or category[:3] not in ['分类:']:
+    category = '分类:' + category
+  data = {}
+  data.update(query)
+  data.pop('token')
+  data["action"] = "query"
+  data["list"] = "categorymembers"
+  data["cmtitle"] = category
+  data["cmlimit"] = "max"
+  return _get_all(data, "categorymembers", "cmcontinue")
+
+
+def referenced_template(template):
+  """api.query.referenced_template
+  
+    获取引用了给定模板的所有页面
+
+    Args:
+      template: 模板名
+        如果没有'模板:'会自动填充
+
+    Returns:
+      List Of Response(py.Dict)
+    
+    Response:
+      {
+        'pageid': 页面id,
+        'ns': 0,
+        'title': 标题,
+      }
+  """
+  # 保证标题名带有命名空间 模板
+  if len(template) <= 3 or template[:3] not in ['模板:']:
+    template = '模板:' + template
+  data = {}
+  data.update(query)
+  data.pop('token')
+  data["action"] = "query"
+  data["list"] = "embeddedin"
+  data["eititle"] = template
+  data["eilimit"] = "max"
+  return _get_all(data, "embeddedin", "eicontinue")
+
+
+def referenced_file(filename):
+  """api.query.referenced_file
+  
+    获取引用了给定文件的所有页面
+
+    Args:
+      template: 文件名
+        如果没有'文件:'会自动填充
+        必须带有后缀名，如'.png'
+
+    Returns:
+      List Of Response(py.Dict)
+    
+    Response:
+      {
+        'pageid': 页面id,
+        'ns': 0,
+        'title': 标题,
+      }
+  """
+  # 保证标题名带有命名空间 文件
+  if len(filename) <= 3 or filename[:3] not in ['文件:']:
+    filename = '文件:' + filename
+  data = {}
+  data.update(query)
+  data.pop('token')
+  data["action"] = "query"
+  data["list"] = "imageusage"
+  data["iutitle"] = filename
+  data["iulimit"] = "max"
+  return _get_all(data, "imageusage", "iucontinue")
+
+
 if __name__ == "__main__":
-  # ress = from_category('公告')
   # ress = ns_main()
-  ress = ns_categories()
-  ttls = to_titles(ress, 'title')
+  # ress = ns_categories()
+  # ress = referenced_category('公告')
+  # ress = referenced_template('黑幕')
+  ress = referenced_file('达芙妮.png')
+  # ttls = to_titles(ress, 'title')
   print(ress)
-  print(ttls)
+  # print(ttls)
 
