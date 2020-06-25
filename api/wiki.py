@@ -126,7 +126,7 @@ def purge(titles):
 
 
 def parse(title):
-  """api.wiki.purge
+  """api.wiki.parse
   
     解析指定标题页面
 
