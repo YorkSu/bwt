@@ -102,5 +102,7 @@ with open("config.json", 'r') as f:
   cookies["SESSDATA"] = cookies2["SESSDATA"]
   query = {
       "format": "json",
+      "utf8": 1,
       "token": get_token(cookies)}
   check_token(cookies, query)
+
