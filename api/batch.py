@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Batch
+"""API
 
   File: 
-    /bwt/batch
+    /bwt/api/batch
 
   Description: 
-    使用 CSV 批量更新模块
+    Batch API
+    使用 CSV 批量更新模块(代更正)
 """
 
 
@@ -13,17 +14,21 @@ import re
 import csv
 import pandas as pd
 
-from bwt.api import edit, getPageContent
+from bwt.api.wiki import edit
+from bwt.api.utils import clone, parse_content
 
 
-def normalize_template(header, row):
-  title = row[0]
-  template = row[1]
-  text = "{{" + template + "\n"
-  for i in range(2, len(row)):
-    text += "|" + header[i] + "=" + row[i] + "\n"
-  text += "}}\n"
-  return title, template, text
+def batch_clone(root, titles, suffix='.wikitext'):
+  for title in titles:
+    clone(root, title, suffix=suffix)
+
+
+def batch_titles(inputs):
+  assert isinstance(inputs, (list, tuple))
+  titles = []
+  for item in inputs:
+    titles.append(item['title'])
+  return titles
 
 
 def handle_file(filename):
@@ -49,7 +54,17 @@ def handle_file(filename):
   return header, content
 
 
-def replace_template(wikitext, template, text):
+def _normalize_template(header, row):
+  title = row[0]
+  template = row[1]
+  text = "{{" + template + "\n"
+  for i in range(2, len(row)):
+    text += "|" + header[i] + "=" + row[i] + "\n"
+  text += "}}\n"
+  return title, template, text
+
+
+def _replace_template(wikitext, template, text):
   if wikitext:
     if "{{" + template in wikitext:
       return re.sub("{{" + template + "\n((.|\n)*?)\n}}\n", text, wikitext, 1)
@@ -60,10 +75,10 @@ def replace_template(wikitext, template, text):
 def update_with_file(filename, template_only=True):
   header, content = handle_file(filename)
   for row in content:
-    title, template, text = normalize_template(header, row)
+    title, template, text = _normalize_template(header, row)
     if template_only:
-      page_content = getPageContent(title)
-      new_text = replace_template(page_content, template, text)
+      page_content = parse_content(title)
+      new_text = _replace_template(page_content, template, text)
       print(edit(title, new_text))
     else:
       print(edit(title, text))

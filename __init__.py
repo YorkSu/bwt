@@ -9,3 +9,7 @@
     Bilibili Wiki Tools
 """
 
+
+from bwt import api
+from bwt import user
+

@@ -2,11 +2,12 @@
 """API
 
   File: 
-    /bwt/api
+    /bwt/api/wiki
 
   Description: 
-    MediaWiki API
+    Bilibili Wiki API
 """
+
 
 import json
 import requests
@@ -50,7 +51,7 @@ def purge(titles):
   return response
 
 
-def getPage(title):
+def parse(title):
   data = {}
   data.update(query)
   data["action"] = "parse"
@@ -60,44 +61,13 @@ def getPage(title):
   return response
 
 
-def getPageContent(title):
-  response = getPage(title)
-  # print(response)
-  if "error" in response:
-    return ""
-  return response["parse"]["wikitext"]["*"]
-
-
-def getAllPage():
-  data = {}
-  data.update(query)
-  data["action"] = "query"
-  data["list"] = "allpages"
-  data["aplimit"] = "max"
-  flag = True
-  apcontinue = ""
-  titles = []
-  while flag:
-    if apcontinue:
-      data["continue"] = "-||"
-      data["apcontinue"] = apcontinue
-    response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
-    titles.extend(response['query']['allpages'])
-    if "continue" in response:
-      apcontinue = response["continue"]["apcontinue"]
-    else:
-      flag = False
-  return titles
-
-
 # test part
 if __name__ == "__main__":
   # print(edit("TestPython", "Hello, World. [From York|VS Code]"))
-  # print(getPageContent("TestPython"))
-  # print(len(getAllPage()))
+  # print(parse("TestPython"))
   # print(purge("好友"))
   # print(purge(["达芙妮", "莉莉丝"]))
   # print(move("TestPython", "TestMovePython"))
-  print(getPageContent("TestMovePython"))
-  print(getPageContent("不存在的页面"))
-  pass
+  print(parse("TestMovePython"))
+  # print(parse("不存在的页面"))
+
