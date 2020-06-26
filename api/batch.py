@@ -15,7 +15,7 @@ import csv
 import pandas as pd
 
 from bwt.api.wiki import edit
-from bwt.api.utils import clone, from_parse
+from bwt.api.utils import clone, update, from_parse
 
 
 def batch_clone(root, titles, suffix='.wikitext', log=True):
@@ -36,11 +36,29 @@ def batch_clone(root, titles, suffix='.wikitext', log=True):
     clone(root, title, suffix=suffix, log=log)
 
 
+def batch_update(filename, titles, log=True):
+  """api.batch.batch_update
+
+    将多个本地文件批量更新到给定标题的页面
+
+    Args:
+      root: 要保存的文件的路径
+      titles: List, 页面标题列表
+      suffix: 文件后缀名, 默认'.wikitext'
+      log: (可选)是否在控制台输出保存信息
+  
+    Console.out:
+      "Clone: {文件名}"
+  """
+  for title in titles:
+    update(filename, title, log=log)
+
+
 def handle_file(filename):
   """api.batch.handle_file
 
     读取CSV或者Excel表，并返回标题和内容
-    *表格的空值会被转换为py.None
+    *表格的空值会被转换为空字符
 
     Args:
       filename: 文件名
@@ -65,7 +83,7 @@ def handle_file(filename):
   # == Excel ==
   elif ext in ['xlsx', 'xls']:
     data = pd.read_excel(filename, header=0)
-    data = data.where(data.notnull(), None)
+    data = data.where(data.notnull(), '')
     header = data.columns.tolist()
     for i in range(data.shape[0]):
       content.append(data.loc[i].tolist())
@@ -90,16 +108,25 @@ def _replace_template(wikitext, template, text):
   return text
 
 
-def update_with_file(filename, template_only=True):
+def table_update(filename, template_only=True):
+  """api.batch.table_update
+
+    使用CSV或者Excel表批量更新对应标题的模板
+    *表格的空值会被转换为空字符
+
+    Args:
+      filename: 文件名
+      template_only: (可选)是否只更新模板部分
+  """
   header, content = handle_file(filename)
   for row in content:
     title, template, text = _normalize_template(header, row)
     if template_only:
       page_content = from_parse(title)
       new_text = _replace_template(page_content, template, text)
-      print(edit(title, new_text))
+      print(f"{row[0]}: {edit(title, new_text)['edit']['result']}")
     else:
-      print(edit(title, text))
+      print(f"{row[0]}: {edit(title, text)['edit']['result']}")
 
 
 # test part
@@ -107,7 +134,7 @@ if __name__ == "__main__":
   # print(handle_file("unpush/test.csv"))
   # print(handle_file("unpush/英雄UP表.xlsx"))
   # update_with_file("unpush/test.csv")
-  update_with_file("unpush/test道具.xlsx", template_only=True)
+  table_update("unpush/test道具.xlsx", template_only=True)
 
   # print([getPageContent("盖亚的钥匙")])
   # print('1234{{1}}'[0:2])

@@ -64,7 +64,7 @@ def update(filename, title, log=True):
 def to_titles(responses, value='title'):
   """api.utils.to_titles
 
-    将Response转换为title
+    将List of Response转换为List of Title
 
     Args:
       responses: List or Tuple Of Response(py.Dict)
