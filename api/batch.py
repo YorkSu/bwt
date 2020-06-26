@@ -15,23 +15,41 @@ import csv
 import pandas as pd
 
 from bwt.api.wiki import edit
-from bwt.api.utils import clone, parse_content
+from bwt.api.utils import clone, from_parse
 
 
-def batch_clone(root, titles, suffix='.wikitext'):
+def batch_clone(root, titles, suffix='.wikitext', log=True):
+  """api.batch.batch_clone
+
+    将给定的多个标题的页面内容批量保存到本地文件
+
+    Args:
+      root: 要保存的文件的路径
+      titles: List, 页面标题列表
+      suffix: 文件后缀名, 默认'.wikitext'
+      log: (可选)是否在控制台输出保存信息
+  
+    Console.out:
+      "Clone: {文件名}"
+  """
   for title in titles:
-    clone(root, title, suffix=suffix)
-
-
-def batch_titles(inputs):
-  assert isinstance(inputs, (list, tuple))
-  titles = []
-  for item in inputs:
-    titles.append(item['title'])
-  return titles
+    clone(root, title, suffix=suffix, log=log)
 
 
 def handle_file(filename):
+  """api.batch.handle_file
+
+    读取CSV或者Excel表，并返回标题和内容
+    *表格的空值会被转换为py.None
+
+    Args:
+      filename: 文件名
+  
+    Returns:
+      (header, content)
+      header: 标题，即表格第一行
+      content: 内容，即表格第二行以下的部分
+  """
   header = []
   content = []
   ext = filename.split('.')[-1]
@@ -77,7 +95,7 @@ def update_with_file(filename, template_only=True):
   for row in content:
     title, template, text = _normalize_template(header, row)
     if template_only:
-      page_content = parse_content(title)
+      page_content = from_parse(title)
       new_text = _replace_template(page_content, template, text)
       print(edit(title, new_text))
     else:
