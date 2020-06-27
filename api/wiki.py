@@ -220,8 +220,8 @@ def expand_templates(text):
 # test part
 if __name__ == "__main__":
   # print(edit("Python", "Hello, World. [BWT v1.0a]"))
-  print(move("Python", "TestMovePython"))
-  # print(parse("Python"))
+  # print(move("Python", "TestMovePython"))
+  print(parse("Python"))
   # print(parse("不存在的页面"))
   # print(purge("好友"))
   # print(purge(["达芙妮", "莉莉丝"]))

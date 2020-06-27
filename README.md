@@ -2,9 +2,13 @@
 
 BWIKI 小工具，基于MediaWiki API
 
+## 版本
+
+Version 1.0 alpha
+
 ## 作者
 
-作者：若可_York，UID：339948505
+作者：若可_York，UID：339948505，QQ：845181897
 
 ## 环境
 

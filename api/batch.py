@@ -108,7 +108,7 @@ def _replace_template(wikitext, template, text):
   return text
 
 
-def table_update(filename, template_only=True):
+def table_update(filename, template_only=True, rule=None):
   """api.batch.table_update
 
     使用CSV或者Excel表批量更新对应标题的模板
@@ -117,10 +117,20 @@ def table_update(filename, template_only=True):
     Args:
       filename: 文件名
       template_only: (可选)是否只更新模板部分
+      rule: 一行数据的处理规则，None表示使用默认处理方式
+          可以传入一个函数，函数要求：
+          1. 接受两个参数: header, row, 分别为表格标题和一行内容
+          2. 返回三个参数: title, template, text
+            title: row[0]
+            template: row[1]
+            text: 自行处理后得到的wikitext格式文本
   """
   header, content = handle_file(filename)
   for row in content:
-    title, template, text = _normalize_template(header, row)
+    if rule is not None and callable(rule):
+      title, template, text = rule(header, row)
+    else:
+      title, template, text = _normalize_template(header, row)
     if template_only:
       page_content = from_parse(title)
       new_text = _replace_template(page_content, template, text)
