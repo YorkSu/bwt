@@ -12,6 +12,7 @@
 import json
 import requests
 
+from bwt.api.utils import from_parse
 from bwt.user import url, cookies, query
 
 
@@ -201,7 +202,7 @@ def referenced_file(filename):
     获取引用了给定文件的所有页面
 
     Args:
-      template: 文件名
+      filename: 文件名
         如果没有'文件:'会自动填充
         必须带有后缀名，如'.png'
 
@@ -228,12 +229,56 @@ def referenced_file(filename):
   return _get_all(data, "imageusage", "iucontinue")
 
 
+def referenced_title(title):
+  """api.query.referenced_title
+  
+    获取链接至指定标题页面的所有页面
+
+    Args:
+      title: 标题
+
+    Returns:
+      List Of Response(py.Dict)
+    
+    Response:
+      {
+        'pageid': 页面id,
+        'ns': 0,
+        'title': 标题,
+      }
+  """
+  # pageid = str(from_parse(title, name='pageid'))
+  data = {}
+  data.update(query)
+  data.pop('token')
+  data["action"] = "query"
+  data["prop"] = "linkshere"
+  data["titles"] = title
+  data["lhlimit"] = "max"
+  receiver = []
+  flag = True
+  continue_ = ""
+  while flag:
+    if continue_:
+      data["lhcontinue"] = continue_
+    response = json.loads(requests.post(url=url, cookies=cookies, data=data).text)
+    _resdict = response["query"]["pages"].popitem()[1]
+    if "linkshere" in _resdict:
+      receiver.extend(_resdict["linkshere"])
+    if "continue" in response:
+      continue_ = response["continue"]["lhcontinue"]
+    else:
+      flag = False
+  return receiver
+
+
 if __name__ == "__main__":
   # ress = ns_main()
   # ress = ns_categories()
   # ress = referenced_category('公告')
   # ress = referenced_template('黑幕')
-  ress = referenced_file('达芙妮.png')
+  # ress = referenced_file('达芙妮.png')
+  ress = referenced_title('达芙妮')
   # ttls = to_titles(ress, 'title')
   print(ress)
   # print(ttls)
